@@ -7,6 +7,7 @@
 #include <X11/Xutil.h>
 #include <GL/gl.h>
 #include <GL/glx.h>
+#include <stdint.h>
 #include "glext.h"
 #include "log_FA.h"
 
@@ -130,6 +131,35 @@ typedef struct
     
 } ScreenQuad;
 
+typedef struct
+{
+    uint32_t width;
+    uint32_t height;
+    uint32_t* pixels;
+} BMPImage;
+
+#pragma pack(push, 1)
+typedef struct 
+{
+    uint16_t fileType;
+    uint32_t fileSize;
+    uint16_t reserved1;
+    uint16_t reserved2;
+    uint32_t bitmapOffset;
+    uint32_t size;
+    int32_t width;
+    int32_t height;
+    uint16_t planes;
+    uint16_t bitsPerPixel;
+    uint32_t compression;
+    uint32_t sizeOfBitmap;
+    int32_t horzResolution;
+    int32_t vertResolution;
+    uint32_t colorsUsed;
+    uint32_t colorsImportant;
+} BitmapHeader;
+#pragma pack(pop)
+
 void configureOpenGL(ContextData* cdata, UserVSyncData* udata);
 
 void freeContextData(ContextData* cdata);
@@ -173,5 +203,7 @@ void enableVSyncIfPossible(ContextData* cdata, UserVSyncData* udata);
 void disableVSyncIfPossible(ContextData* cdata, UserVSyncData* udata);
 
 void enableAdaptiveVSyncIfPossible(ContextData* cdata, UserVSyncData* udata);
+
+void readImage(BMPImage* image, const char* filename);
 
 #endif

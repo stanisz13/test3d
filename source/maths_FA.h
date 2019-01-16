@@ -324,6 +324,11 @@ double lengthDVec4(DVec4 v);
 float lengthUVec4(UVec4 v);
 float lengthIVec4(IVec4 v);
 
+FVec2 initFVec2(float a, float b);
+FVec3 initFVec3(float a, float b, float c);
+FVec4 initFVec4(float a, float b, float c, float d);
+
+
 //NOTE(Stanisz13): MATRICES
 
 float* accessFMat2(FMat2* m, unsigned x, unsigned y);

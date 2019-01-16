@@ -694,3 +694,41 @@ void enableAdaptiveVSyncIfPossible(ContextData* cdata, UserVSyncData* udata)
         return;
     }
 }
+
+unsigned totalPixelSize(const BMPImage* image)
+{
+    return image->width * image->height * sizeof(unsigned);
+}
+
+BMPImage allocateImage(unsigned width, unsigned height)
+{
+    BMPImage image;
+    image.width = width;
+    image.height = height;
+
+    unsigned outputPixelsSize = totalPixelSize(&image);
+    image.pixels = (unsigned*)malloc(outputPixelsSize);
+
+    return image;
+}
+
+void readImage(BMPImage* image, const char* filename)
+{
+    FILE* inFile = fopen(filename, "rb");
+    
+    if (inFile)
+    {
+        BitmapHeader header;
+        
+        fread(&header, sizeof(header), 1, inFile);
+        uint32_t inputPixelsSize = totalPixelSize(image);
+
+        *image = allocateImage(header.width, header.height);
+        fread(image->pixels, inputPixelsSize, 1, inFile);
+        fclose(inFile);
+    }
+    else
+    {
+        logError("Unable to read BMP file!");
+    }
+}

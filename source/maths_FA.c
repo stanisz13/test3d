@@ -1024,6 +1024,39 @@ float lengthIVec4(IVec4 v)
     return res;
 }
 
+FVec2 initFVec2(float a, float b)
+{
+    FVec2 res;
+
+    res.x = a;
+    res.y = b;
+
+    return res;
+}
+
+FVec3 initFVec3(float a, float b, float c)
+{
+    FVec3 res;
+
+    res.x = a;
+    res.y = b;
+    res.z = c;
+    
+    return res;
+}
+
+FVec4 initFVec4(float a, float b, float c, float d)
+{
+    FVec4 res;
+
+    res.x = a;
+    res.y = b;
+    res.z = c;
+    res.w = d;
+    
+    return res;
+}
+
 FMat2 addFMat2(FMat2 a, FMat2 b)
 {
     FMat2 res = a;
@@ -1387,11 +1420,14 @@ FMat4 projectionFMat4(float near, float far,
     float left = - right;
     
     res.col1.x = (2.0f * near) / (right - left);
+
     res.col2.y = (2.0f * near) / (top - bottom);
+
     res.col3.x = (right + left) / (right - left);
     res.col3.y = (top + bottom) / (top - bottom);
     res.col3.z = (-far - near) / (far - near);
     res.col3.w = -1.0f;
+
     res.col4.z = (-2.0f * far * near) / (far - near);
     
     return res;
@@ -1433,9 +1469,9 @@ FMat4 translationFMat4(FVec3 v)
 {
     FMat4 res = identityFMat4();
 
-    res.col3.x = v.x;
-    res.col3.y = v.y;
-    res.col3.z = v.z;
+    res.col1.w = v.x;
+    res.col2.w = v.y;
+    res.col3.w = v.z;
     
     return res;
 }

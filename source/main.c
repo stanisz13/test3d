@@ -21,17 +21,79 @@ int main(int argc, char* argv[])
 
     configureOpenGL(&contextData, &userVSyncData);
     loadFunctionPointers();
-    
-#if USE_EBO_TO_DRAW_QUAD == 1
-    ScreenQuadWithEBO squad;
-    configureScreenQuadWithEBO(&squad);
-#else
-    ScreenQuad squad;
-    configureScreenQuad(&squad);
-#endif
-        
-    glDisable(GL_DEPTH_TEST);
 
+        // ------------------------------------------------------------------
+    float vertices[] = {
+        // positions          // texture coords
+         0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // top right
+         0.5f, -0.5f, 0.0f,   1.0f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // bottom left
+        -0.5f,  0.5f, 0.0f,   0.0f, 1.0f  // top left 
+    };
+    unsigned int indices[] = {
+        0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
+    };
+    unsigned int VBO, VAO, EBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // texture coord attribute
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    float aRatio = contextData.windowWidth / contextData.windowHeight;
+
+
+    BMPImage image;
+    readImage(&image, "beauty.bmp");
+    
+    int basic = createShaderProgram("shaders/basic.vs", "shaders/basic.fs");
+    glUseProgram_FA(basic);
+    
+    glEnable(GL_DEPTH_TEST);
+
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load image, create texture and generate mipmaps
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.pixels);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    free(image.pixels);
+    
+    unsigned modelLoc = glGetUniformLocation_FA(basic, "model");
+    unsigned projLoc = glGetUniformLocation_FA(basic, "proj");
+    unsigned viewLoc = glGetUniformLocation_FA(basic, "view");
+    
+    FVec3 scalingV = initFVec3(0.5f, 0.5f, 1.0f);
+    FMat4 model = identityFMat4();//scalingFMat4(scalingV);
+    FMat4 proj = identityFMat4();//projectionFMat4(1.0f, 10.0f, aRatio, degreesToRadians(45.0f));
+    FMat4 view = identityFMat4();//rotationFMat4(degreesToRadians(45.0f), initFVec3(0.0f, 0.0f, -1.0f));
+    
+    glUniformMatrix4fv_FA(modelLoc, 1, GL_FALSE, model.mem);
+    glUniformMatrix4fv_FA(projLoc, 1, GL_FALSE, proj.mem);
+    glUniformMatrix4fv_FA(viewLoc, 1, GL_FALSE, view.mem);
+    
 #if 0
     disableVSyncIfPossible(&contextData, &userVSyncData);
 #else
@@ -66,7 +128,7 @@ int main(int argc, char* argv[])
         }
 
         glClearColor(0, 0.5, 1, 1);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
 #if USE_EBO_TO_DRAW_QUAD == 1
         glDrawElements(GL_TRIANGLE_STRIP, 6, GL_UNSIGNED_INT, 0);
@@ -103,12 +165,6 @@ int main(int argc, char* argv[])
     }
 
     freeContextData(&contextData);
-
-#if USE_EBO_TO_DRAW_QUAD == 1
-    freeScreenQuadWithEBO(&squad);
-#else
-    freeScreenQuad(&squad);
-#endif
 
     return 0;
 }
