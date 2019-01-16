@@ -1396,3 +1396,58 @@ FMat4 projectionFMat4(float near, float far,
     
     return res;
 }
+
+FMat4 rotationFMat4(float angleRadians, FVec3 rotationAxis)
+{
+    FMat4 res;
+
+    float s = sin(angleRadians);
+    float c = cos(angleRadians);
+
+    float oneMinusC = 1.0f - c;
+    
+    res.col1.x = c + rotationAxis.x * rotationAxis.x * oneMinusC;
+    res.col1.y = rotationAxis.x * rotationAxis.y * oneMinusC + rotationAxis.z * s;
+    res.col1.z = rotationAxis.z * rotationAxis.x * oneMinusC - rotationAxis.y * s;
+    res.col1.w = 0.0f;
+
+    res.col2.x = rotationAxis.x * rotationAxis.y * oneMinusC - rotationAxis.z * s;
+    res.col2.y = c + rotationAxis.y * rotationAxis.y * oneMinusC;
+    res.col2.z = rotationAxis.z * rotationAxis.y * oneMinusC + rotationAxis.x * s;
+    res.col2.w = 0.0f;
+
+    res.col3.x = rotationAxis.x * rotationAxis.z * oneMinusC + rotationAxis.y * s;
+    res.col3.y = rotationAxis.y * rotationAxis.z * oneMinusC - rotationAxis.x * s;
+    res.col3.z = c + rotationAxis.z * rotationAxis.z * oneMinusC;
+    res.col3.w = 0.0f;
+    
+    res.col4.x = 0.0f;
+    res.col4.y = 0.0f;
+    res.col4.z = 0.0f;
+    res.col4.w = 1.0f;
+   
+    return res;
+}
+
+FMat4 translationFMat4(FVec3 v)
+{
+    FMat4 res = identityFMat4();
+
+    res.col3.x = v.x;
+    res.col3.y = v.y;
+    res.col3.z = v.z;
+    
+    return res;
+}
+
+FMat4 scalingFMat4(FVec3 v)
+{
+    FMat4 res = {};
+
+    res.col1.x = v.x;
+    res.col2.y = v.y;
+    res.col3.z = v.z;
+    res.col4.w = 1.0f;
+    
+    return res;
+}

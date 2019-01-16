@@ -511,8 +511,7 @@ void configureScreenQuad(ScreenQuad* squad)
     glBufferData_FA(GL_ARRAY_BUFFER, sizeof(screenQuadVerts), &screenQuadVerts, GL_STATIC_DRAW);
 
     glVertexAttribPointer_FA(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray_FA(0);
-    
+    glEnableVertexAttribArray_FA(0);    
 }
 
 

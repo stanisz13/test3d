@@ -361,4 +361,8 @@ FVec4 mulFMat4ByFVec4(FMat4 a, FVec4 b);
 FMat4 projectionFMat4(float near, float far,
                       float aRatio, float FOVradians);
 
+FMat4 rotationFMat4(float angleRadians, FVec3 rotationAxis);
+FMat4 translationFMat4(FVec3 v);
+FMat4 scalingFMat4(FVec3 v);
+
 #endif

@@ -1,6 +1,4 @@
 #include "graphics_FA.h"
-#include <math.h>
-#include <time.h>
 #include "maths_FA.h"
 
 int isRunning = 1;
