@@ -1,0 +1,40 @@
+# depslib dependency file v1.0
+1547834254 source:/home/blk/Documents/programming/faithEngine/test3d/source/graphics_FA.c
+	"graphics_FA.h"
+
+1547832997 /home/blk/Documents/programming/faithEngine/test3d/source/graphics_FA.h
+	<stdlib.h>
+	<string.h>
+	<unistd.h>
+	<X11/Xlib.h>
+	<X11/Xutil.h>
+	<GL/gl.h>
+	<GL/glx.h>
+	<stdint.h>
+	"glext.h"
+	"log_FA.h"
+
+1546877515 /home/blk/Documents/programming/faithEngine/test3d/source/glext.h
+	<windows.h>
+	<KHR/khrplatform.h>
+
+1546929204 /home/blk/Documents/programming/faithEngine/test3d/source/log_FA.h
+	<stdio.h>
+
+1546929114 source:/home/blk/Documents/programming/faithEngine/test3d/source/log_FA.c
+	"log_FA.h"
+
+1547833709 source:/home/blk/Documents/programming/faithEngine/test3d/source/main.c
+	"graphics_FA.h"
+	"maths_FA.h"
+
+1547674762 /home/blk/Documents/programming/faithEngine/test3d/source/maths_FA.h
+	<limits.h>
+	<float.h>
+	<time.h>
+	<string.h>
+	<math.h>
+
+1547677204 source:/home/blk/Documents/programming/faithEngine/test3d/source/maths_FA.c
+	"maths_FA.h"
+

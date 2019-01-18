@@ -283,6 +283,10 @@ void freeContextData(ContextData* cdata)
 
 void loadFunctionPointers()
 {
+    //NOTE(Stanisz13): TEXTURES:
+    glGenerateMipmap_FA = (PFNGLGENERATEMIPMAPPROC)glXGetProcAddressARB((const unsigned char*)"glGenerateMipmap");
+    glActiveTexture_FA = (PFNGLACTIVETEXTUREPROC)glXGetProcAddressARB((const unsigned char*)"glActiveTexture");
+   
     //NOTE(Stanisz13): FRAMEBUFFERS
     glGenFramebuffers_FA = (PFNGLGENFRAMEBUFFERSPROC)glXGetProcAddress((const unsigned char*)"glGenFramebuffers");
     glBindFramebuffer_FA = (PFNGLBINDFRAMEBUFFERPROC)glXGetProcAddress((const unsigned char*)"glBindFramebuffer");
@@ -695,18 +699,13 @@ void enableAdaptiveVSyncIfPossible(ContextData* cdata, UserVSyncData* udata)
     }
 }
 
-unsigned totalPixelSize(const BMPImage* image)
-{
-    return image->width * image->height * sizeof(unsigned);
-}
-
 BMPImage allocateImage(unsigned width, unsigned height)
 {
     BMPImage image;
     image.width = width;
     image.height = height;
 
-    unsigned outputPixelsSize = totalPixelSize(&image);
+    unsigned outputPixelsSize = width * height * sizeof(unsigned);
     image.pixels = (unsigned*)malloc(outputPixelsSize);
 
     return image;
@@ -721,7 +720,7 @@ void readImage(BMPImage* image, const char* filename)
         BitmapHeader header;
         
         fread(&header, sizeof(header), 1, inFile);
-        uint32_t inputPixelsSize = totalPixelSize(image);
+        uint32_t inputPixelsSize = header.width * header.height * sizeof(unsigned);
 
         *image = allocateImage(header.width, header.height);
         fread(image->pixels, inputPixelsSize, 1, inFile);
