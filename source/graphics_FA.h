@@ -151,6 +151,7 @@ typedef struct
 
 //NOTE(Stanisz13): GLOBALS
 MouseState mouseState_FA;
+unsigned keysPressed_FA[200];
 
 void configureOpenGL(ContextData* cdata, UserVSyncData* udata);
 

@@ -179,18 +179,18 @@ int main(int argc, char* argv[])
                     break;
 
                 case KeyPress:
-                    printf("KeyPress: %d\n", event.xkey.keycode);
-
-                    if (event.xkey.keycode == 0x09)
-                        isRunning = 0;
-                    
+                    keysPressed_FA[event.xkey.keycode] = 1;
                     break;
                     
                 case KeyRelease:
-                    
-
+                    keysPressed_FA[event.xkey.keycode] = 0;
                     break;
             }
+        }
+
+        if (keysPressed_FA[9] == 1)
+        {
+            isRunning = 0;
         }
         
         if (isRunning == 0)
