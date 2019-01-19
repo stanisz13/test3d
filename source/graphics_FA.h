@@ -139,7 +139,8 @@ typedef struct
 {
     unsigned left;
     unsigned right;
-
+    unsigned middle;
+    
     int wheel; //NOTE(Stanisz13): sign depending on scroll direction
     
 } MouseState;

@@ -120,6 +120,7 @@ int main(int argc, char* argv[])
     while(1)
     {
         XEvent event;
+        mouseState_FA.wheel = 0;
 
         while (XPending(contextData.display))
         {
@@ -132,19 +133,26 @@ int main(int argc, char* argv[])
                         isRunning = 0;
                     break;
 
+                case KeymapNotify:
+                    XRefreshKeyboardMapping(&event.xmapping);
+                    break;
+                    
                 case ButtonPress:
                     switch(event.xbutton.button)
                     {
                         case Button1:
                             mouseState_FA.left = 1;
                             break;
+                        case Button2:
+                            mouseState_FA.middle = 1;
+                            break;
                         case Button3:
                             mouseState_FA.right = 1;
                             break;
-                        case Button4:/* middle mouse wheel moved */
+                        case Button4:
                             mouseState_FA.wheel = 1;
                             break;
-                        case Button5:/* middle mouse wheel moved */
+                        case Button5:
                             mouseState_FA.wheel = -1;
                             break;
                     }
@@ -156,6 +164,9 @@ int main(int argc, char* argv[])
                         case Button1:
                             mouseState_FA.left = 0;
                             break;
+                        case Button2:
+                            mouseState_FA.middle = 0;
+                            break;
                         case Button3:
                             mouseState_FA.right = 0;
                             break;
@@ -163,14 +174,12 @@ int main(int argc, char* argv[])
                     break;
             }
         }
-
-        logU(mouseState_FA.left);
         
         if (isRunning == 0)
         {
             break;
         }
-
+        
         glClearColor(0, 0.5, 1, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
