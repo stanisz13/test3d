@@ -71,10 +71,11 @@ int main(int argc, char* argv[])
     unsigned viewLoc = glGetUniformLocation_FA(basic, "view");
 
     FVec3 scalingV = initFVec3(0.5f, 0.5f, 1.0f);
-    FMat4 model = identityFMat4();//scalingFMat4(scalingV);
-    FMat4 proj = identityFMat4();//projectionFMat4(1.0f, 10.0f, aRatio, degreesToRadians(45.0f));
-    FMat4 view = identityFMat4();//rotationFMat4(degreesToRadians(45.0f), initFVec3(0.0f, 0.0f, -1.0f));
-
+    FMat4 model = translationFMat4(initFVec3(0.0f, 0.0f, -5.0f));
+    model = mulFMat4(model, rotationFMat4(degreesToRadians(-60.0f), initFVec3(1.0f, 1.0f, 0.0f)));
+    FMat4 proj = projectionFMat4(0.01f, 10.0f, 1.0f, degreesToRadians(32.0f));
+    FMat4 view = identityFMat4();
+    
     glUniformMatrix4fv_FA(modelLoc, 1, GL_FALSE, model.mem);
     glUniformMatrix4fv_FA(projLoc, 1, GL_FALSE, proj.mem);
     glUniformMatrix4fv_FA(viewLoc, 1, GL_FALSE, view.mem);
