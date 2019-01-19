@@ -1,6 +1,6 @@
 #version 330 core
 
-layout (location = 0) in vec2 inPos;
+layout (location = 0) in vec3 inPos;
 layout (location = 1) in vec2 aTexCoord;
 
 out vec4 posPass;
@@ -12,7 +12,7 @@ uniform mat4 view;
 
 void main()
 {
-    posPass = proj *view * model * vec4(inPos, 0.0f, 1.0f);
+    posPass = proj *view * model * vec4(inPos, 1.0f);
     gl_Position = posPass;
     TexCoord = vec2(aTexCoord.x, aTexCoord.y);
 }
