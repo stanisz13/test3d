@@ -268,7 +268,8 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
     XSetWMProtocols(cdata->display, cdata->window, &cdata->deleteMessage, 1);
 
     XSelectInput(cdata->display, cdata->window, ButtonPressMask|ButtonReleaseMask|
-                 StructureNotifyMask|KeyPressMask|KeyReleaseMask|KeymapStateMask);
+                 StructureNotifyMask|KeyPressMask|KeyReleaseMask|KeymapStateMask|
+                 PointerMotionMask);
     
     glXMakeCurrent(cdata->display, cdata->window, cdata->ctx);
 }

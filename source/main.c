@@ -172,6 +172,24 @@ int main(int argc, char* argv[])
                             break;
                     }
                     break;
+
+                case MotionNotify:
+                    mouseState_FA.posX = event.xmotion.x;
+                    mouseState_FA.posY = event.xmotion.y;
+                    break;
+
+                case KeyPress:
+                    printf("KeyPress: %d\n", event.xkey.keycode);
+
+                    if (event.xkey.keycode == 0x09)
+                        isRunning = 0;
+                    
+                    break;
+                    
+                case KeyRelease:
+                    
+
+                    break;
             }
         }
         

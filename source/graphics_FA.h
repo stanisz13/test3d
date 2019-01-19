@@ -140,9 +140,13 @@ typedef struct
     unsigned left;
     unsigned right;
     unsigned middle;
+
+    //NOTE(Stanisz13): Left top corner is (0, 0), bottom right corner is (screenW, screenH);
+    unsigned posX;
+    unsigned posY;
     
     int wheel; //NOTE(Stanisz13): sign depending on scroll direction
-    
+
 } MouseState;
 
 //NOTE(Stanisz13): GLOBALS
