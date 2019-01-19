@@ -1,8 +1,8 @@
 # depslib dependency file v1.0
-1547834254 source:/home/blk/Documents/programming/faithEngine/test3d/source/graphics_FA.c
+1547908887 source:/home/blk/Documents/programming/faithEngine/test3d/source/graphics_FA.c
 	"graphics_FA.h"
 
-1547832997 /home/blk/Documents/programming/faithEngine/test3d/source/graphics_FA.h
+1547909452 /home/blk/Documents/programming/faithEngine/test3d/source/graphics_FA.h
 	<stdlib.h>
 	<string.h>
 	<unistd.h>
@@ -24,7 +24,7 @@
 1546929114 source:/home/blk/Documents/programming/faithEngine/test3d/source/log_FA.c
 	"log_FA.h"
 
-1547833709 source:/home/blk/Documents/programming/faithEngine/test3d/source/main.c
+1547908513 source:/home/blk/Documents/programming/faithEngine/test3d/source/main.c
 	"graphics_FA.h"
 	"maths_FA.h"
 

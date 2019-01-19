@@ -142,7 +142,8 @@ typedef struct
     uint32_t* pixels;
 } BMPImage;
 
-#pragma pack(push, 1)
+#pragma pack(push)
+#pragma pack(1)
 typedef struct 
 {
     uint16_t fileType;
@@ -173,8 +174,6 @@ void loadFunctionPointers();
 unsigned RGBAtoUnsigned(unsigned char r, unsigned char g,
                         unsigned char b, unsigned char a);
 
-unsigned ColorToUnsigned(const Color* c);
-
 void createTextureForDrawingBuffer(ContextData* cdata, PixelBufferData* pdata);
 
 void drawTextureWithBufferData(ContextData* cdata, PixelBufferData* pdata);
@@ -185,7 +184,11 @@ float lerpFloat(float v0, float v1, float t);
 
 Color lerpColor(const Color* a, const Color* b, const float t);
 
-unsigned ColorToUnsigned(const Color* c);
+Color unsignedToColor(unsigned mask);
+
+unsigned colorToUnsigned(const Color* c);
+
+unsigned colorToRGBA(const Color* c);
 
 Color RGBAtoColor(unsigned char r, unsigned char g,
                   unsigned char b, unsigned char a);

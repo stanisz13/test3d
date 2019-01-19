@@ -14,10 +14,10 @@ unsigned isExtensionSupported(const char *extList, const char *extension)
     // ---
     // Helper to check for extension string presence.  Adapted from:
     //   http://www.opengl.org/resources/features/OGLextensions/
-    
+
     const char *start;
     const char *where, *terminator;
-  
+
     where = strchr(extension, ' ');
     if (where || *extension == '\0')
         return 0;
@@ -47,12 +47,12 @@ int ctxErrorHandler(Display *dpy, XErrorEvent *ev)
     return 0;
 }
 
-typedef enum 
+typedef enum
 {
     MESA_V_SYNC = 1,
     EXT_V_SYNC = 2,
     SGI_V_SYNC = 4
-    
+
 } UserVSyncDataMasks;
 
 void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
@@ -65,7 +65,7 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
 #else
     XSynchronize(cdata->display, 1);
 #endif
-    
+
     if (!cdata->display)
     {
         logError("Unable to start communication with X server!");
@@ -92,7 +92,7 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
         };
 
     int glx_major, glx_minor;
- 
+
     // Check if the version is not less than minimal
     if (!glXQueryVersion(cdata->display, &glx_major, &glx_minor))
     {
@@ -101,7 +101,7 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
     }
 
     printf("Your version of GLX drivers is: %u.%u\n", glx_major, glx_minor);
-    
+
     if (glx_major < cdata->minimalGLXVersionMajor
         || glx_minor < cdata->minimalGLXVersionMinor)
     {
@@ -117,7 +117,7 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
         logError("Failed to retrieve any framebuffer config");
         exit(0);
     }
-    
+
 #if 0
     printf("Found %d matching framebuffer configs\n", fbcount);
 #endif
@@ -125,7 +125,7 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
     // Pick the framebuffer config/visual with the most samples per pixel
     int best_fbc = -1, worst_fbc = -1, best_num_samp = -1, worst_num_samp = 999;
     int i;
-    
+
     for (i=0; i<fbcount; ++i)
     {
         XVisualInfo *vi = glXGetVisualFromFBConfig(cdata->display, fbc[i]);
@@ -134,9 +134,9 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
             int samp_buf, samples;
             glXGetFBConfigAttrib(cdata->display, fbc[i], GLX_SAMPLE_BUFFERS, &samp_buf);
             glXGetFBConfigAttrib(cdata->display, fbc[i], GLX_SAMPLES, &samples);
-#if 0     
+#if 0
             printf("  Matching fbconfig %d, visual ID 0x%2x: SAMPLE_BUFFERS = %d,"
-                   " SAMPLES = %d\n", 
+                   " SAMPLES = %d\n",
                    i, vi->visualid, samp_buf, samples);
 #endif
             if (best_fbc < 0 || (samp_buf && samples > best_num_samp))
@@ -144,7 +144,7 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
             if (worst_fbc < 0 || (!samp_buf || samples < worst_num_samp))
                 worst_fbc = i, worst_num_samp = samples;
         }
-        
+
         XFree(vi);
     }
 
@@ -157,19 +157,19 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
 #if 0
     printf("Chosen visual ID = 0x%x\n", vi->visualid);
 #endif
-    
+
     XSetWindowAttributes swa;
     swa.colormap = cdata->cmap = XCreateColormap(cdata->display,
-                                           RootWindow(cdata->display, vi->screen), 
+                                           RootWindow(cdata->display, vi->screen),
                                            vi->visual, AllocNone);
     swa.background_pixmap = None;
     swa.border_pixel = 0;
     swa.event_mask = StructureNotifyMask;
 
-    cdata->window = XCreateWindow(cdata->display, RootWindow(cdata->display, vi->screen), 
+    cdata->window = XCreateWindow(cdata->display, RootWindow(cdata->display, vi->screen),
                                 0, 0, cdata->windowWidth, cdata->windowHeight,
-                                0, vi->depth, InputOutput, 
-                                vi->visual, 
+                                0, vi->depth, InputOutput,
+                                vi->visual,
                                 CWBorderPixel|CWColormap|CWEventMask, &swa);
     if (!cdata->window)
     {
@@ -189,18 +189,18 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
     glXCreateContextAttribsARBProc glXCreateContextAttribsARB = 0;
     glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc)
         glXGetProcAddressARB((const GLubyte *)"glXCreateContextAttribsARB");
-    
+
     int (*oldHandler)(Display*, XErrorEvent*) =
         XSetErrorHandler(&ctxErrorHandler);
 
     //logS(glxExts);
-     
+
     // Check for the GLX_ARB_create_context extension string and the function.
     if (!isExtensionSupported(glxExts, "GLX_ARB_create_context") ||
          !glXCreateContextAttribsARB)
     {
         logError("glXCreateContextAttribsARB() not found!");
-        exit(0);    
+        exit(0);
     }
     else
     {
@@ -217,7 +217,7 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
             udata->mask |= SGI_V_SYNC;
         }
 
-        
+
         int context_attribs[] =
             {
                 GLX_CONTEXT_MAJOR_VERSION_ARB, cdata->minimalGLVersionMajor,
@@ -231,7 +231,7 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
 
         // Sync to ensure any errors generated are processed.
         XSync(cdata->display, False);
-        
+
         if (cdata->ctx)
             printf("Created GL %u.%u context\n", cdata->minimalGLVersionMajor, cdata->minimalGLVersionMinor);
         else
@@ -286,7 +286,7 @@ void loadFunctionPointers()
     //NOTE(Stanisz13): TEXTURES:
     glGenerateMipmap_FA = (PFNGLGENERATEMIPMAPPROC)glXGetProcAddressARB((const unsigned char*)"glGenerateMipmap");
     glActiveTexture_FA = (PFNGLACTIVETEXTUREPROC)glXGetProcAddressARB((const unsigned char*)"glActiveTexture");
-   
+
     //NOTE(Stanisz13): FRAMEBUFFERS
     glGenFramebuffers_FA = (PFNGLGENFRAMEBUFFERSPROC)glXGetProcAddress((const unsigned char*)"glGenFramebuffers");
     glBindFramebuffer_FA = (PFNGLBINDFRAMEBUFFERPROC)glXGetProcAddress((const unsigned char*)"glBindFramebuffer");
@@ -316,7 +316,7 @@ void loadFunctionPointers()
     glUniformMatrix4fv_FA = (PFNGLUNIFORMMATRIX4FVPROC)glXGetProcAddress((const unsigned char*)"glUniformMatrix4fv");
     glUniformMatrix3fv_FA = (PFNGLUNIFORMMATRIX3FVPROC)glXGetProcAddress((const unsigned char*)"glUniformMatrix3fv");
     glUniformMatrix2fv_FA = (PFNGLUNIFORMMATRIX2FVPROC)glXGetProcAddress((const unsigned char*)"glUniformMatrix2fv");
-    
+
     //NOTE(Stanisz13): PROGRAMS
     glCreateProgram_FA = (PFNGLCREATEPROGRAMPROC)glXGetProcAddress((const unsigned char*)"glCreateProgram");
     glLinkProgram_FA = (PFNGLLINKPROGRAMPROC)glXGetProcAddress((const unsigned char*)"glLinkProgram");
@@ -337,7 +337,7 @@ void loadFunctionPointers()
     glBindVertexArray_FA = (PFNGLBINDVERTEXARRAYPROC)glXGetProcAddress((const unsigned char*)"glBindVertexArray");
     glDeleteBuffers_FA = (PFNGLDELETEBUFFERSPROC)glXGetProcAddress((const unsigned char*)"glDeleteBuffers");
     glDeleteVertexArrays_FA = (PFNGLDELETEVERTEXARRAYSPROC)glXGetProcAddress((const unsigned char*)"glDeleteVertexArrays");
-    
+
     //NOTE(Stanisz13): V_SYNC
     glXSwapIntervalMESA_FA = (PFNGLXSWAPINTERVALMESAPROC)glXGetProcAddress((const unsigned char*)"glXSwapIntervalMESA");
     glXSwapIntervalEXT_FA = (PFNGLXSWAPINTERVALEXTPROC)glXGetProcAddress((const unsigned char*)"glXSwapIntervalEXT");
@@ -347,26 +347,58 @@ void loadFunctionPointers()
 unsigned RGBAtoUnsigned(unsigned char r, unsigned char g,
                         unsigned char b, unsigned char a)
 {
-    return (a << 24) | (b << 16) | (g << 8) | r;    
+    //NOTE(Stanisz13): packing values to ARGB, but computer understands this memory as BGRA somehow...
+
+    unsigned res = 0;
+
+    res |= ((unsigned)r << 0);
+    res |= ((unsigned)g << 8);
+    res |= ((unsigned)b << 16);
+    res |= ((unsigned)a << 24);
+
+    return res;
+}
+
+unsigned colorToRGBA(const Color* c)
+{
+    unsigned res = 0;
+
+    res |= ((unsigned)c->r << 24);
+    res |= ((unsigned)c->g << 16);
+    res |= ((unsigned)c->b << 8);
+    res |= ((unsigned)c->a << 0);
+
+    return res;
+}
+
+Color unsignedToColor(unsigned mask)
+{
+    Color res;
+    res.a = (unsigned char)(mask);
+    res.b = (unsigned char)(mask >> 8);
+    res.g = (unsigned char)(mask >> 16);
+    res.r = (unsigned char)(mask >> 24);
+
+    return res;
 }
 
 void createTextureForDrawingBuffer(ContextData* cdata, PixelBufferData* pdata)
-{    
+{
     glGenTextures(1, &pdata->texture);
     glBindTexture(GL_TEXTURE_2D, pdata->texture);
-    
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     float vertices[] = {
         // positions       // texture coords
         1.0f,  1.0f, 0.0f, 1.0f, 1.0f, // top right
         1.0f, -1.0f, 0.0f, 1.0f, 0.0f, // bottom right
         -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, // bottom left
-        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f  // top left 
+        -1.0f,  1.0f, 0.0f, 0.0f, 1.0f  // top left
     };
 
-    unsigned indices[] = {  
+    unsigned indices[] = {
         0, 1, 3, 2
     };
 
@@ -394,10 +426,10 @@ void createTextureForDrawingBuffer(ContextData* cdata, PixelBufferData* pdata)
 void drawTextureWithBufferData(ContextData* cdata, PixelBufferData* pdata)
 {
     glBindTexture(GL_TEXTURE_2D, pdata->texture);
-        
+
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, cdata->windowWidth, cdata->windowHeight,
                  0, GL_RGBA, GL_UNSIGNED_BYTE, pdata->pixels);
-        
+
     glUseProgram_FA(pdata->basicProgram);
     glBindVertexArray_FA(pdata->VAO);
     glDrawElements(GL_TRIANGLE_STRIP, 6, GL_UNSIGNED_INT, 0);
@@ -421,10 +453,10 @@ Color lerpColor(const Color* a, const Color* b, const float t)
     res.b = (unsigned char)lerp(a->b, b->b, t);
     res.a = (unsigned char)lerp(a->a, b->a, t);
 
-    return res;     
+    return res;
 }
 
-unsigned ColorToUnsigned(const Color* c)
+unsigned colorToUnsigned(const Color* c)
 {
     return RGBAtoUnsigned(c->r, c->g, c->b, c->a);
 }
@@ -437,7 +469,7 @@ Color RGBAtoColor(const unsigned char r, const unsigned char g,
     res.g = g;
     res.b = b;
     res.a = a;
-    
+
     return res;
 }
 
@@ -452,14 +484,14 @@ void configurePingpongBuffer(ContextData* cdata, PingpongBuffer* pbuf)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F,
                      cdata->windowWidth, cdata->windowHeight,
                      0, GL_RED, GL_FLOAT, 0);
-          
+
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glFramebufferTexture2D_FA(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                GL_TEXTURE_2D, pbuf->texture[i], 0);
-    }        
+    }
 
 }
 
@@ -481,7 +513,7 @@ void configureScreenQuadWithEBO(ScreenQuadWithEBO* squad)
     glGenVertexArrays_FA(1, &squad->VAO);
     glGenBuffers_FA(1, &squad->VBO);
     glGenBuffers_FA(1, &squad->EBO);
-    
+
     glBindVertexArray_FA(squad->VAO);
 
     glBindBuffer_FA(GL_ARRAY_BUFFER, squad->VBO);
@@ -508,14 +540,14 @@ void configureScreenQuad(ScreenQuad* squad)
 
     glGenVertexArrays_FA(1, &squad->VAO);
     glGenBuffers_FA(1, &squad->VBO);
-    
+
     glBindVertexArray_FA(squad->VAO);
 
     glBindBuffer_FA(GL_ARRAY_BUFFER, squad->VBO);
     glBufferData_FA(GL_ARRAY_BUFFER, sizeof(screenQuadVerts), &screenQuadVerts, GL_STATIC_DRAW);
 
     glVertexAttribPointer_FA(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray_FA(0);    
+    glEnableVertexAttribArray_FA(0);
 }
 
 
@@ -535,9 +567,9 @@ void freeScreenQuadWithEBO(ScreenQuadWithEBO* squad)
 void loadEntireFile(const char* path, unsigned char** source)
 {
     FILE* file = fopen(path, "r");
-    
+
     fseek(file, 0, SEEK_END);
-    unsigned fileSize = ftell(file); 
+    unsigned fileSize = ftell(file);
     fseek(file, 0, SEEK_SET);
 
     *source = (unsigned char *)calloc(1, fileSize + 1);
@@ -546,10 +578,10 @@ void loadEntireFile(const char* path, unsigned char** source)
     if (fread(*source, fileSize, 1, file) != 1) {
         logError("Failed reading file!");
         logError(path);
-        
+
         return;
     }
-         
+
     fclose(file);
 }
 
@@ -564,15 +596,15 @@ unsigned createShaderProgram(const char* pathToVS, const char* pathToFS)
     unsigned char* fsCode;
     loadEntireFile(pathToVS, &vsCode);
     loadEntireFile(pathToFS, &fsCode);
-    
+
     vertex = glCreateShader_FA(GL_VERTEX_SHADER);
     fragment = glCreateShader_FA(GL_FRAGMENT_SHADER);
     glShaderSource_FA(vertex, 1, (const char**)&vsCode, NULL);
     glShaderSource_FA(fragment, 1, (const char**)&fsCode, NULL);
-    
+
     glCompileShader_FA(vertex);
     glCompileShader_FA(fragment);
-    
+
     glGetShaderiv_FA(vertex, GL_COMPILE_STATUS, &success);
 
     if(!success)
@@ -588,7 +620,7 @@ unsigned createShaderProgram(const char* pathToVS, const char* pathToFS)
         glGetShaderInfoLog_FA(fragment, 512, NULL, infoLog);
         printf("fragment shader error: %s\n", infoLog);
     }
-    
+
     program = glCreateProgram_FA();
     glAttachShader_FA(program, vertex);
     glAttachShader_FA(program, fragment);
@@ -598,7 +630,7 @@ unsigned createShaderProgram(const char* pathToVS, const char* pathToFS)
     if(!success)
     {
         glGetProgramInfoLog_FA(program, 512, NULL, infoLog);
-        printf("%s\n", infoLog);     
+        printf("%s\n", infoLog);
     }
 
     glDeleteShader_FA(vertex);
@@ -606,7 +638,7 @@ unsigned createShaderProgram(const char* pathToVS, const char* pathToFS)
 
     free(vsCode);
     free(fsCode);
-    
+
     return program;
 }
 
@@ -649,7 +681,7 @@ void enableVSyncIfPossible(ContextData* cdata, UserVSyncData* udata)
     }
 
     logWarning("V-SYNC ENABLED!");
-    
+
     if (udata->mask & MESA_V_SYNC)
     {
         glXSwapIntervalMESA_FA(1);
@@ -679,7 +711,7 @@ void enableAdaptiveVSyncIfPossible(ContextData* cdata, UserVSyncData* udata)
     }
 
     logWarning("ADAPTIVE V-SYNC ENABLED!");
-    
+
     if (udata->mask & MESA_V_SYNC)
     {
         glXSwapIntervalMESA_FA(-1);
@@ -711,19 +743,42 @@ BMPImage allocateImage(unsigned width, unsigned height)
     return image;
 }
 
+unsigned p[100];
+
 void readImage(BMPImage* image, const char* filename)
 {
     FILE* inFile = fopen(filename, "rb");
-    
+
     if (inFile)
     {
         BitmapHeader header;
-        
+
         fread(&header, sizeof(header), 1, inFile);
         uint32_t inputPixelsSize = header.width * header.height * sizeof(unsigned);
 
         *image = allocateImage(header.width, header.height);
+
+        
         fread(image->pixels, inputPixelsSize, 1, inFile);
+
+        unsigned *running = image->pixels;
+        for (unsigned i = 0; i < header.width * header.height; ++i)
+        {
+            
+            unsigned raw = *running;
+            unsigned char red = (raw >> 16);
+            unsigned char blue = (raw);
+
+            unsigned newVal = (raw & 0xff00ff00);
+            newVal |= (red);
+            newVal |= (blue << 16);
+
+            *running = newVal;
+
+            
+            ++running;
+        }
+
         fclose(inFile);
     }
     else
