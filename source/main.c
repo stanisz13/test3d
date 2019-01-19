@@ -57,29 +57,14 @@ int main(int argc, char* argv[])
     float aRatio = (float)contextData.windowWidth / contextData.windowHeight;
 
 
-    BMPImage image;
-    readImage(&image, "beauty.bmp");
+    unsigned tex;
+    loadBMPtexture("beauty.bmp", &tex);
 
     int basic = createShaderProgram("shaders/basic.vs", "shaders/basic.fs");
     glUseProgram_FA(basic);
 
     glEnable(GL_DEPTH_TEST);
 
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load image, create texture and generate mipmaps
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.pixels);
-    glGenerateMipmap_FA(GL_TEXTURE_2D);
-    glActiveTexture_FA(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    free(image.pixels);
 
     unsigned modelLoc = glGetUniformLocation_FA(basic, "model");
     unsigned projLoc = glGetUniformLocation_FA(basic, "proj");

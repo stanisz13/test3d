@@ -344,29 +344,14 @@ void loadFunctionPointers()
     glXSwapIntervalSGI_FA = (PFNGLXSWAPINTERVALSGIPROC)glXGetProcAddress((const unsigned char*)"glXSwapIntervalSGI");
 }
 
-unsigned RGBAtoUnsigned(unsigned char r, unsigned char g,
-                        unsigned char b, unsigned char a)
-{
-    //NOTE(Stanisz13): packing values to ARGB, but computer understands this memory as BGRA somehow...
-
-    unsigned res = 0;
-
-    res |= ((unsigned)r << 0);
-    res |= ((unsigned)g << 8);
-    res |= ((unsigned)b << 16);
-    res |= ((unsigned)a << 24);
-
-    return res;
-}
-
-unsigned colorToRGBA(const Color* c)
+unsigned colorToUnsigned(const Color* c)
 {
     unsigned res = 0;
 
-    res |= ((unsigned)c->r << 24);
-    res |= ((unsigned)c->g << 16);
-    res |= ((unsigned)c->b << 8);
-    res |= ((unsigned)c->a << 0);
+    res |= ((unsigned)c->r << 0);
+    res |= ((unsigned)c->g << 8);
+    res |= ((unsigned)c->b << 16);
+    res |= ((unsigned)c->a << 24);
 
     return res;
 }
@@ -374,10 +359,11 @@ unsigned colorToRGBA(const Color* c)
 Color unsignedToColor(unsigned mask)
 {
     Color res;
-    res.a = (unsigned char)(mask);
-    res.b = (unsigned char)(mask >> 8);
-    res.g = (unsigned char)(mask >> 16);
-    res.r = (unsigned char)(mask >> 24);
+
+    res.r = (unsigned char)(mask);
+    res.g = (unsigned char)(mask >> 8);
+    res.b = (unsigned char)(mask >> 16);
+    res.a = (unsigned char)(mask >> 24);
 
     return res;
 }
@@ -452,23 +438,6 @@ Color lerpColor(const Color* a, const Color* b, const float t)
     res.g = (unsigned char)lerp(a->g, b->g, t);
     res.b = (unsigned char)lerp(a->b, b->b, t);
     res.a = (unsigned char)lerp(a->a, b->a, t);
-
-    return res;
-}
-
-unsigned colorToUnsigned(const Color* c)
-{
-    return RGBAtoUnsigned(c->r, c->g, c->b, c->a);
-}
-
-Color RGBAtoColor(const unsigned char r, const unsigned char g,
-                  const unsigned char b, const unsigned char a)
-{
-    Color res;
-    res.r = r;
-    res.g = g;
-    res.b = b;
-    res.a = a;
 
     return res;
 }
@@ -731,24 +700,43 @@ void enableAdaptiveVSyncIfPossible(ContextData* cdata, UserVSyncData* udata)
     }
 }
 
-BMPImage allocateImage(unsigned width, unsigned height)
+#pragma pack(push, 1)
+typedef struct 
 {
-    BMPImage image;
-    image.width = width;
-    image.height = height;
+    uint16_t fileType;
+    uint32_t fileSize;
+    uint16_t reserved1;
+    uint16_t reserved2;
+    uint32_t bitmapOffset;
+    uint32_t size;
+    int32_t width;
+    int32_t height;
+    uint16_t planes;
+    uint16_t bitsPerPixel;
+    uint32_t compression;
+    uint32_t sizeOfBitmap;
+    int32_t horzResolution;
+    int32_t vertResolution;
+    uint32_t colorsUsed;
+    uint32_t colorsImportant;
 
-    unsigned outputPixelsSize = width * height * sizeof(unsigned);
-    image.pixels = (unsigned*)malloc(outputPixelsSize);
+} BitmapHeader;
+#pragma pack(pop)
 
-    return image;
-}
+typedef struct
+{
+    uint32_t width;
+    uint32_t height;
+    uint32_t* pixels;
 
-unsigned p[100];
+} BMPImage;
 
-void readImage(BMPImage* image, const char* filename)
+unsigned loadBMPtexture(const char* filename, unsigned* texture)
 {
     FILE* inFile = fopen(filename, "rb");
 
+    unsigned success = 1;
+    
     if (inFile)
     {
         BitmapHeader header;
@@ -756,15 +744,20 @@ void readImage(BMPImage* image, const char* filename)
         fread(&header, sizeof(header), 1, inFile);
         uint32_t inputPixelsSize = header.width * header.height * sizeof(unsigned);
 
-        *image = allocateImage(header.width, header.height);
-
+        BMPImage image;
+        image.width = header.width;
+        image.height = header.height;
+        image.pixels = (unsigned*)malloc(inputPixelsSize);
         
-        fread(image->pixels, inputPixelsSize, 1, inFile);
+        fread(image.pixels, inputPixelsSize, 1, inFile);
 
-        unsigned *running = image->pixels;
-        for (unsigned i = 0; i < header.width * header.height; ++i)
-        {
-            
+        //NOTE(Stanisz13): Gimp exports 32-bit BMPs in ARGB memory layout.
+        // The layout that is expected on linux machine (possibly to
+        // match OpenGL expectancy) is ABGR. Thus, there is a need to
+        // swap R and B channels.        
+        unsigned *running = image.pixels;
+        for (unsigned i = 0; i < inputPixelsSize; i += 4)
+        {            
             unsigned raw = *running;
             unsigned char red = (raw >> 16);
             unsigned char blue = (raw);
@@ -775,14 +768,32 @@ void readImage(BMPImage* image, const char* filename)
 
             *running = newVal;
 
-            
             ++running;
         }
 
         fclose(inFile);
+
+        glGenTextures(1, texture);
+        glBindTexture(GL_TEXTURE_2D, *texture);
+        // set the texture wrapping parameters
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        // set texture filtering parameters
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        // load image, create texture and generate mipmaps
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.pixels);
+        glGenerateMipmap_FA(GL_TEXTURE_2D);
+        glActiveTexture_FA(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, *texture);
+
+        free(image.pixels);
     }
     else
     {
         logError("Unable to read BMP file!");
+        success = 0;
     }
+
+    return success;
 }
