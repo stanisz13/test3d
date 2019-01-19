@@ -21,6 +21,7 @@ int main(int argc, char* argv[])
 
     configureOpenGL(&contextData, &userVSyncData);
     loadFunctionPointers();
+
     float vertices[] = {
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
@@ -123,15 +124,48 @@ int main(int argc, char* argv[])
         while (XPending(contextData.display))
         {
             XNextEvent(contextData.display, &event);
+            
             switch (event.type)
             {
                 case ClientMessage:
                     if (event.xclient.data.l[0] == contextData.deleteMessage)
                         isRunning = 0;
                     break;
+
+                case ButtonPress:
+                    switch(event.xbutton.button)
+                    {
+                        case Button1:
+                            mouseState_FA.left = 1;
+                            break;
+                        case Button3:
+                            mouseState_FA.right = 1;
+                            break;
+                        case Button4:/* middle mouse wheel moved */
+                            mouseState_FA.wheel = 1;
+                            break;
+                        case Button5:/* middle mouse wheel moved */
+                            mouseState_FA.wheel = -1;
+                            break;
+                    }
+                    break;
+
+                case ButtonRelease:
+                    switch(event.xbutton.button)
+                    {
+                        case Button1:
+                            mouseState_FA.left = 0;
+                            break;
+                        case Button3:
+                            mouseState_FA.right = 0;
+                            break;
+                    }
+                    break;
             }
         }
 
+        logU(mouseState_FA.left);
+        
         if (isRunning == 0)
         {
             break;

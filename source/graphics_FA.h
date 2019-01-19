@@ -135,6 +135,18 @@ typedef struct
     
 } ScreenQuad;
 
+typedef struct
+{
+    unsigned left;
+    unsigned right;
+
+    int wheel; //NOTE(Stanisz13): sign depending on scroll direction
+    
+} MouseState;
+
+//NOTE(Stanisz13): GLOBALS
+MouseState mouseState_FA;
+
 void configureOpenGL(ContextData* cdata, UserVSyncData* udata);
 
 void freeContextData(ContextData* cdata);

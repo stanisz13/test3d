@@ -6,7 +6,6 @@
 typedef GLXContext (*glXCreateContextAttribsARBProc)
 (Display*, GLXFBConfig, GLXContext, Bool, const int*);
 
-
 unsigned isExtensionSupported(const char *extList, const char *extension)
 {
     //copied from :
@@ -243,7 +242,7 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
 
     // Sync to ensure any errors generated are processed.
     XSync(cdata->display, 0);
-
+    
     // Restore the original error handler
     XSetErrorHandler(oldHandler);
 
@@ -268,6 +267,9 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
     cdata->deleteMessage = XInternAtom(cdata->display, "WM_DELETE_WINDOW", 0);
     XSetWMProtocols(cdata->display, cdata->window, &cdata->deleteMessage, 1);
 
+    XSelectInput(cdata->display, cdata->window, ButtonPressMask|ButtonReleaseMask|
+                 StructureNotifyMask|KeyPressMask|KeyReleaseMask|KeymapStateMask);
+    
     glXMakeCurrent(cdata->display, cdata->window, cdata->ctx);
 }
 

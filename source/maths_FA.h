@@ -204,7 +204,6 @@ typedef struct
 //NOTE(Stanisz13): GLOBALS
 RandomSeries randomSeries_FA;
 
-
 //NOTE(Stanisz13): FUNCTIONS
 //NOTE(Stanisz13): NUMERIC
 float absFloat(float v);
