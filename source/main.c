@@ -179,6 +179,7 @@ int main(int argc, char* argv[])
                     break;
 
                 case KeyPress:
+                    logU(event.xkey.keycode);
                     keysPressed_FA[event.xkey.keycode] = 1;
                     break;
                     
@@ -188,12 +189,7 @@ int main(int argc, char* argv[])
             }
         }
 
-        if (keysPressed_FA[9] == 1)
-        {
-            isRunning = 0;
-        }
-        
-        if (isRunning == 0)
+        if (keysPressed_FA[9] == 1 || isRunning == 0)
         {
             break;
         }
@@ -201,7 +197,7 @@ int main(int argc, char* argv[])
         glClearColor(0, 0.5, 1, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        model = mulFMat4(model, rotationFMat4(dt/1000, initFVec3(1.0f, 1.0f, 0.3f)));
+        model = mulFMat4(model, rotationFMat4(dt/1000, initFVec3(1.0f, 0.0f, 0.0f)));
         glUniformMatrix4fv_FA(modelLoc, 1, GL_FALSE, model.mem);
     
 

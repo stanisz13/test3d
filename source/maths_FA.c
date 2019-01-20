@@ -1024,6 +1024,114 @@ float lengthIVec4(IVec4 v)
     return res;
 }
 
+FVec2 normalizeFVec2(FVec2 v)
+{
+    FVec2 res;
+
+    res = scaleFVec2(v, 1.0f / lengthFVec2(v));
+
+    return res;
+}
+
+DVec2 normalizeDVec2(DVec2 v)
+{
+    DVec2 res;
+
+    res = scaleDVec2(v, 1.0f / lengthDVec2(v));
+
+    return res;
+}
+
+UVec2 normalizeUVec2(UVec2 v)
+{
+    UVec2 res;
+
+    res = scaleUVec2(v, 1.0f / lengthUVec2(v));
+
+    return res;
+}
+
+IVec2 normalizeIVec2(IVec2 v)
+{
+    IVec2 res;
+
+    res = scaleIVec2(v, 1.0f / lengthIVec2(v));
+
+    return res;
+}
+
+FVec3 normalizeFVec3(FVec3 v)
+{
+    FVec3 res;
+
+    res = scaleFVec3(v, 1.0f / lengthFVec3(v));
+
+    return res;
+}
+
+DVec3 normalizeDVec3(DVec3 v)
+{
+    DVec3 res;
+
+    res = scaleDVec3(v, 1.0f / lengthDVec3(v));
+
+    return res;
+}
+
+UVec3 normalizeUVec3(UVec3 v)
+{
+    UVec3 res;
+
+    res = scaleUVec3(v, 1.0f / lengthUVec3(v));
+
+    return res;
+}
+
+IVec3 normalizeIVec3(IVec3 v)
+{
+    IVec3 res;
+
+    res = scaleIVec3(v, 1.0f / lengthIVec3(v));
+
+    return res;
+}
+
+FVec4 normalizeFVec4(FVec4 v)
+{
+    FVec4 res;
+
+    res = scaleFVec4(v, 1.0f / lengthFVec4(v));
+
+    return res;
+}
+
+DVec4 normalizeDVec4(DVec4 v)
+{
+    DVec4 res;
+
+    res = scaleDVec4(v, 1.0f / lengthDVec4(v));
+
+    return res;
+}
+
+UVec4 normalizeUVec4(UVec4 v)
+{
+    UVec4 res;
+
+    res = scaleUVec4(v, 1.0f / lengthUVec4(v));
+
+    return res;
+}
+
+IVec4 normalizeIVec4(IVec4 v)
+{
+    IVec4 res;
+
+    res = scaleIVec4(v, 1.0f / lengthIVec4(v));
+
+    return res;
+}
+
 FVec2 initFVec2(float a, float b)
 {
     FVec2 res;

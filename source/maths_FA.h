@@ -323,6 +323,19 @@ double lengthDVec4(DVec4 v);
 float lengthUVec4(UVec4 v);
 float lengthIVec4(IVec4 v);
 
+FVec2 normalizeFVec2(FVec2 v);
+DVec2 normalizeDVec2(DVec2 v);
+UVec2 normalizeUVec2(UVec2 v);
+IVec2 normalizeIVec2(IVec2 v);
+FVec3 normalizeFVec3(FVec3 v);
+DVec3 normalizeDVec3(DVec3 v);
+UVec3 normalizeUVec3(UVec3 v);
+IVec3 normalizeIVec3(IVec3 v);
+FVec4 normalizeFVec4(FVec4 v);
+DVec4 normalizeDVec4(DVec4 v);
+UVec4 normalizeUVec4(UVec4 v);
+IVec4 normalizeIVec4(IVec4 v);
+
 FVec2 initFVec2(float a, float b);
 FVec3 initFVec3(float a, float b, float c);
 FVec4 initFVec4(float a, float b, float c, float d);
