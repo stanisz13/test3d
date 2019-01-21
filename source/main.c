@@ -13,8 +13,8 @@ int main(int argc, char* argv[])
     contextData.minimalGLXVersionMinor = 3;
     contextData.minimalGLVersionMajor = 3;
     contextData.minimalGLVersionMinor = 3;
-    contextData.windowWidth = 1920;
-    contextData.windowHeight = 1080;
+    contextData.windowWidth = 800;
+    contextData.windowHeight = 800;
     contextData.name = "Faith";
 
     UserVSyncData userVSyncData;
@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
 
 
     unsigned tex;
-    loadBMPtexture("beauty.bmp", &tex);
+    loadBMPtexture("img.bmp", &tex);
 
     int basic = createShaderProgram("shaders/basic.vs", "shaders/basic.fs");
     glUseProgram_FA(basic);
@@ -177,10 +177,20 @@ int main(int argc, char* argv[])
                 case MotionNotify:
                     mouseState_FA.posX = event.xmotion.x;
                     mouseState_FA.posY = event.xmotion.y;
+
+                    mouseState_FA.posX *= 2;
+                    mouseState_FA.posX -= contextData.windowWidth;
+
+                    mouseState_FA.posY *= 2;
+                    mouseState_FA.posY -= contextData.windowHeight;
+                    mouseState_FA.posY *= -1.0f;
+
+                    mouseState_FA.posX /= contextData.windowWidth;
+                    mouseState_FA.posY /= contextData.windowHeight;
+                    
                     break;
 
                 case KeyPress:
-                    logU(event.xkey.keycode);
                     keysPressed_FA[event.xkey.keycode] = 1;
                     break;
                     
@@ -194,11 +204,11 @@ int main(int argc, char* argv[])
         {
             break;
         }
-        
+
         glClearColor(0, 0.5, 1, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        model = mulFMat4(model, rotationFMat4(dt/1000, initFVec3(1.0f, 1.0f, 1.0f)));
+        model = mulFMat4(model, rotationFMat4(dt/1000, initFVec3(1.0f, 1.0f, 0.3f)));
         glUniformMatrix4fv_FA(modelLoc, 1, GL_FALSE, model.mem);
     
 
