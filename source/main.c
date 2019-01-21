@@ -117,6 +117,7 @@ int main(int argc, char* argv[])
     float elapsed = 0.0f;
     float maxFrameTimeNoticed = 0.0f;
 
+    
     while(1)
     {
         XEvent event;
@@ -197,7 +198,7 @@ int main(int argc, char* argv[])
         glClearColor(0, 0.5, 1, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        model = mulFMat4(model, rotationFMat4(dt/1000, initFVec3(1.0f, 1.0f, 0.0f)));
+        model = mulFMat4(model, rotationFMat4(dt/1000, initFVec3(1.0f, 1.0f, 1.0f)));
         glUniformMatrix4fv_FA(modelLoc, 1, GL_FALSE, model.mem);
     
 

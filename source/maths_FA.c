@@ -386,7 +386,8 @@ FVec3 scaleFVec3(FVec3 v, float s)
 
     res.x *= s;
     res.y *= s;
-
+    res.z *= s;
+    
     return res;
 }
 
@@ -396,7 +397,8 @@ DVec3 scaleDVec3(DVec3 v, double s)
 
     res.x *= s;
     res.y *= s;
-
+    res.z *= s;
+    
     return res;
 }
 
@@ -406,7 +408,8 @@ UVec3 scaleUVec3(UVec3 v, unsigned s)
 
     res.x *= s;
     res.y *= s;
-
+    res.z *= s;
+    
     return res;
 }
 
@@ -416,6 +419,7 @@ IVec3 scaleIVec3(IVec3 v, int s)
 
     res.x *= s;
     res.y *= s;
+    res.z *= s;
 
     return res;
 }
@@ -426,7 +430,9 @@ FVec4 scaleFVec4(FVec4 v, float s)
 
     res.x *= s;
     res.y *= s;
-
+    res.z *= s;
+    res.w *= s;
+    
     return res;
 }
 
@@ -436,6 +442,8 @@ DVec4 scaleDVec4(DVec4 v, double s)
 
     res.x *= s;
     res.y *= s;
+    res.z *= s;
+    res.w *= s;
 
     return res;
 }
@@ -446,6 +454,8 @@ UVec4 scaleUVec4(UVec4 v, unsigned s)
 
     res.x *= s;
     res.y *= s;
+    res.z *= s;
+    res.w *= s;
 
     return res;
 }
@@ -456,6 +466,8 @@ IVec4 scaleIVec4(IVec4 v, int s)
 
     res.x *= s;
     res.y *= s;
+    res.z *= s;
+    res.w *= s;
 
     return res;
 }
@@ -1545,8 +1557,14 @@ FMat4 rotationFMat4(float angleRadians, FVec3 rotationAxis)
 {
     FMat4 res;
 
-    rotationAxis = normalizeFVec3(rotationAxis);
-    
+    float lSq = lengthSquaredFVec3(rotationAxis);
+    float diff = lSq - 1.0f; 
+
+    if (diff > EPSILON)
+    {
+        rotationAxis = normalizeFVec3(rotationAxis);
+    }
+        
     float s = sin(angleRadians);
     float c = cos(angleRadians);
 

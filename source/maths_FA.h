@@ -6,6 +6,7 @@
 #include <time.h>
 #include <string.h>
 #include <math.h>
+#include "log_FA.h"
 
 #define EPSILON 0.0000001f
 #define EPSILON_DOUBLE 0.0000000000001f
