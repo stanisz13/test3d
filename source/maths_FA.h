@@ -195,6 +195,14 @@ typedef struct
     };
 } FMat4;
 
+typedef struct
+{
+    FVec3 pos;
+    FVec3 target;
+    FVec3 absoluteUp;
+
+} Camera;
+
 //NOTE(Stanisz13): RANDOM
 typedef struct
 {
@@ -204,6 +212,7 @@ typedef struct
 
 //NOTE(Stanisz13): GLOBALS
 RandomSeries randomSeries_FA;
+Camera camera_FA;
 
 //NOTE(Stanisz13): FUNCTIONS
 //NOTE(Stanisz13): NUMERIC
@@ -298,6 +307,8 @@ double dotProductDVec4(DVec4 v, DVec4 w);
 unsigned dotProductUVec4(UVec4 v, UVec4 w);
 int dotProductIVec4(IVec4 v, IVec4 w);
 
+FVec3 crossProductFVec3(FVec3 a, FVec3 b);
+
 float lengthSquaredFVec2(FVec2 v);
 double lengthSquaredDVec2(DVec2 v);
 unsigned lengthSquaredUVec2(UVec2 v);
@@ -382,5 +393,7 @@ FMat4 perspectiveFMat4(float near, float far,
 FMat4 rotationFMat4(float angleRadians, FVec3 rotationAxis);
 FMat4 translationFMat4(FVec3 v);
 FMat4 scalingFMat4(FVec3 v);
+
+FMat4 lookAt();
 
 #endif

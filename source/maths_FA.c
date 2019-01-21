@@ -845,6 +845,17 @@ int dotProductIVec4(IVec4 v, IVec4 w)
     return res;    
 }
 
+FVec3 crossProductFVec3(FVec3 a, FVec3 b)
+{
+    FVec3 res;
+
+    res.x = a.y * b.z - a.z * b.y;
+    res.y = a.x * b.z - a.z * b.x;
+    res.z = a.x * b.y - a.y * b.x;
+    
+    return res;
+}
+
 float lengthSquaredFVec2(FVec2 v)
 {
     float res = v.x * v.x
@@ -1611,6 +1622,39 @@ FMat4 scalingFMat4(FVec3 v)
     res.col1.x = v.x;
     res.col2.y = v.y;
     res.col3.z = v.z;
+    res.col4.w = 1.0f;
+    
+    return res;
+}
+
+FMat4 lookAt()
+{
+    FMat4 res;
+
+    FVec3 absoluteUp = initFVec3(0.0f, 1.0f, 0.0f);
+    
+    FVec3 dir = normalizeFVec3(addFVec3(camera_FA.pos, scaleFVec3(camera_FA.target, -1.0f)));
+    FVec3 right = normalizeFVec3(crossProductFVec3(absoluteUp, dir));
+    FVec3 up = crossProductFVec3(dir, right);
+    
+    res.col1.x = right.x;
+    res.col1.y = up.x;
+    res.col1.z = dir.x;
+    res.col1.w = 0.0f;
+
+    res.col2.x = right.y;
+    res.col2.y = up.y;
+    res.col2.z = dir.y;
+    res.col2.w = 0.0f;
+
+    res.col3.x = right.z;
+    res.col3.y = up.z;
+    res.col3.z = dir.z;
+    res.col3.w = 0.0f;
+
+    res.col4.x = -camera_FA.pos.x * right.x - camera_FA.pos.y * right.y - camera_FA.pos.z * right.z;
+    res.col4.y = -camera_FA.pos.x * up.x - camera_FA.pos.y * up.y - camera_FA.pos.z * up.z;
+    res.col4.z = -camera_FA.pos.x * dir.x - camera_FA.pos.y * dir.y - camera_FA.pos.z * dir.z;
     res.col4.w = 1.0f;
     
     return res;
