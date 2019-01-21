@@ -1529,7 +1529,7 @@ FVec4 mulFMat4ByFVec4(FMat4 a, FVec4 b)
     return res;
 }
 
-FMat4 projectionFMat4(float near, float far,
+FMat4 perspectiveFMat4(float near, float far,
                       float aRatio, float FOVradians)
 {
     FMat4 res = {};

@@ -376,7 +376,7 @@ FVec2 mulFMat2ByFVec2(FMat2 a, FVec2 b);
 FVec3 mulFMat3ByFVec3(FMat3 a, FVec3 b);
 FVec4 mulFMat4ByFVec4(FMat4 a, FVec4 b);
 
-FMat4 projectionFMat4(float near, float far,
+FMat4 perspectiveFMat4(float near, float far,
                       float aRatio, float FOVradians);
 
 FMat4 rotationFMat4(float angleRadians, FVec3 rotationAxis);

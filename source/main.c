@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
     unsigned viewLoc = glGetUniformLocation_FA(basic, "view");
                         
     FMat4 model = translationFMat4(initFVec3(0.0f, 0.0f, -3.0f));
-    FMat4 proj = projectionFMat4(0.01f, 10.0f, aRatio, degreesToRadians(45.0f));
+    FMat4 proj = perspectiveFMat4(0.01f, 10.0f, aRatio, degreesToRadians(45.0f));
     FMat4 view = identityFMat4();
     
     glUniformMatrix4fv_FA(projLoc, 1, GL_FALSE, proj.mem);
