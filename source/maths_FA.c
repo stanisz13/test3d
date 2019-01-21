@@ -1545,6 +1545,8 @@ FMat4 rotationFMat4(float angleRadians, FVec3 rotationAxis)
 {
     FMat4 res;
 
+    rotationAxis = normalizeFVec3(rotationAxis);
+    
     float s = sin(angleRadians);
     float c = cos(angleRadians);
 
