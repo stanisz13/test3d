@@ -152,10 +152,12 @@ typedef struct
 //NOTE(Stanisz13): GLOBALS
 MouseState mouseState_FA;
 unsigned keysPressed_FA[200];
+ContextData contextData_FA;
+UserVSyncData vSyncData_FA;
 
-void configureOpenGL(ContextData* cdata, UserVSyncData* udata);
+void configureOpenGL();
 
-void freeContextData(ContextData* cdata);
+void freeContextData();
 
 void loadFunctionPointers();
 
@@ -168,9 +170,9 @@ unsigned colorToUnsigned(const Color* c);
 Color RGBAtoColor(unsigned char r, unsigned char g,
                   unsigned char b, unsigned char a);
 
-void createTextureForDrawingBuffer(ContextData* cdata, PixelBufferData* pdata);
+void createTextureForDrawingBuffer(PixelBufferData* pdata);
 
-void drawTextureWithBufferData(ContextData* cdata, PixelBufferData* pdata);
+void drawTextureWithBufferData(PixelBufferData* pdata);
 
 void freePixelData(PixelBufferData* pdata);
 
@@ -178,7 +180,7 @@ float lerpFloat(float v0, float v1, float t);
 
 Color lerpColor(const Color* a, const Color* b, const float t);
 
-void configurePingpongBuffer(ContextData* cdata, PingpongBuffer* pbuf);
+void configurePingpongBuffer(PingpongBuffer* pbuf);
 
 void configureScreenQuadWithEBO(ScreenQuadWithEBO* squad);
 
@@ -190,15 +192,17 @@ void freeScreenQuadWithEBO(ScreenQuadWithEBO* squad);
 
 unsigned createShaderProgram(const char* pathToVS, const char* pathToFS);
 
-void enableVSyncIfPossible(ContextData* cdata, UserVSyncData* udata);
+void enableVSyncIfPossible();
 
-void disableVSyncIfPossible(ContextData* cdata, UserVSyncData* udata);
+void disableVSyncIfPossible();
 
-void enableAdaptiveVSyncIfPossible(ContextData* cdata, UserVSyncData* udata);
+void enableAdaptiveVSyncIfPossible();
 
 //NOTE(Stanisz13): The bmp must have alpha channel, values for pixels are
 // expected to be 32bit. The memory layout of loaded image is ARGB, but
 // the memory layout of stored data is ABGR.
 unsigned loadBMPtexture(const char* filename, unsigned* texture);
+
+void mouseCoordsToNDC();
 
 #endif

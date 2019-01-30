@@ -215,6 +215,7 @@ RandomSeries randomSeries_FA;
 Camera camera_FA;
 
 //NOTE(Stanisz13): FUNCTIONS
+
 //NOTE(Stanisz13): NUMERIC
 float absFloat(float v);
 int absInt(int v);

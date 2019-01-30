@@ -54,18 +54,18 @@ typedef enum
 
 } UserVSyncDataMasks;
 
-void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
+void configureOpenGL()
 {
     // Open a comminication to X server with default screen name.
-    cdata->display = XOpenDisplay(NULL);
+    contextData_FA.display = XOpenDisplay(NULL);
 
 #if 0
-    XSynchronize(cdata->display, 0);
+    XSynchronize(contextData_FA.display, 0);
 #else
-    XSynchronize(cdata->display, 1);
+    XSynchronize(contextData_FA.display, 1);
 #endif
 
-    if (!cdata->display)
+    if (!contextData_FA.display)
     {
         logError("Unable to start communication with X server!");
         exit(0);
@@ -93,7 +93,7 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
     int glx_major, glx_minor;
 
     // Check if the version is not less than minimal
-    if (!glXQueryVersion(cdata->display, &glx_major, &glx_minor))
+    if (!glXQueryVersion(contextData_FA.display, &glx_major, &glx_minor))
     {
         logError("Could not obtain GLX drivers version!");
         exit(0);
@@ -101,15 +101,15 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
 
     printf("Your version of GLX drivers is: %u.%u\n", glx_major, glx_minor);
 
-    if (glx_major < cdata->minimalGLXVersionMajor
-        || glx_minor < cdata->minimalGLXVersionMinor)
+    if (glx_major < contextData_FA.minimalGLXVersionMajor
+        || glx_minor < contextData_FA.minimalGLXVersionMinor)
     {
         logError("Your version of GLX drivers does not match the minimum requirements!");
         exit(0);
     }
 
     int fbcount;
-    GLXFBConfig* fbc = glXChooseFBConfig(cdata->display, DefaultScreen(cdata->display),
+    GLXFBConfig* fbc = glXChooseFBConfig(contextData_FA.display, DefaultScreen(contextData_FA.display),
                                          visual_attribs, &fbcount);
     if (!fbc)
     {
@@ -127,12 +127,12 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
 
     for (i=0; i<fbcount; ++i)
     {
-        XVisualInfo *vi = glXGetVisualFromFBConfig(cdata->display, fbc[i]);
+        XVisualInfo *vi = glXGetVisualFromFBConfig(contextData_FA.display, fbc[i]);
         if (vi)
         {
             int samp_buf, samples;
-            glXGetFBConfigAttrib(cdata->display, fbc[i], GLX_SAMPLE_BUFFERS, &samp_buf);
-            glXGetFBConfigAttrib(cdata->display, fbc[i], GLX_SAMPLES, &samples);
+            glXGetFBConfigAttrib(contextData_FA.display, fbc[i], GLX_SAMPLE_BUFFERS, &samp_buf);
+            glXGetFBConfigAttrib(contextData_FA.display, fbc[i], GLX_SAMPLES, &samples);
 #if 0
             printf("  Matching fbconfig %d, visual ID 0x%2x: SAMPLE_BUFFERS = %d,"
                    " SAMPLES = %d\n",
@@ -151,26 +151,26 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
 
     XFree(fbc);
 
-    XVisualInfo *vi = glXGetVisualFromFBConfig(cdata->display, bestFbc);
+    XVisualInfo *vi = glXGetVisualFromFBConfig(contextData_FA.display, bestFbc);
 
 #if 0
     printf("Chosen visual ID = 0x%x\n", vi->visualid);
 #endif
 
     XSetWindowAttributes swa;
-    swa.colormap = cdata->cmap = XCreateColormap(cdata->display,
-                                           RootWindow(cdata->display, vi->screen),
+    swa.colormap = contextData_FA.cmap = XCreateColormap(contextData_FA.display,
+                                           RootWindow(contextData_FA.display, vi->screen),
                                            vi->visual, AllocNone);
     swa.background_pixmap = None;
     swa.border_pixel = 0;
     swa.event_mask = StructureNotifyMask;
 
-    cdata->window = XCreateWindow(cdata->display, RootWindow(cdata->display, vi->screen),
-                                0, 0, cdata->windowWidth, cdata->windowHeight,
+    contextData_FA.window = XCreateWindow(contextData_FA.display, RootWindow(contextData_FA.display, vi->screen),
+                                0, 0, contextData_FA.windowWidth, contextData_FA.windowHeight,
                                 0, vi->depth, InputOutput,
                                 vi->visual,
                                 CWBorderPixel|CWColormap|CWEventMask, &swa);
-    if (!cdata->window)
+    if (!contextData_FA.window)
     {
         logError("Failed to create X window!");
         exit(0);
@@ -178,12 +178,12 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
 
     XFree(vi);
 
-    XStoreName(cdata->display, cdata->window, cdata->name);
+    XStoreName(contextData_FA.display, contextData_FA.window, contextData_FA.name);
 
-    XMapWindow(cdata->display, cdata->window);
+    XMapWindow(contextData_FA.display, contextData_FA.window);
 
-    const char *glxExts = glXQueryExtensionsString(cdata->display,
-                                                   DefaultScreen(cdata->display));
+    const char *glxExts = glXQueryExtensionsString(contextData_FA.display,
+                                                   DefaultScreen(contextData_FA.display));
 
     glXCreateContextAttribsARBProc glXCreateContextAttribsARB = 0;
     glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc)
@@ -205,34 +205,34 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
     {
         if (isExtensionSupported(glxExts, "GLX_MESA_swap_control"))
         {
-            udata->mask |= MESA_V_SYNC;
+            vSyncData_FA.mask |= MESA_V_SYNC;
         }
         if (isExtensionSupported(glxExts, "GLX_EXT_swap_control_tear"))
         {
-            udata->mask |= EXT_V_SYNC;
+            vSyncData_FA.mask |= EXT_V_SYNC;
         }
         if (isExtensionSupported(glxExts, "GLX_SGI_swap_control"))
         {
-            udata->mask |= SGI_V_SYNC;
+            vSyncData_FA.mask |= SGI_V_SYNC;
         }
 
 
         int context_attribs[] =
             {
-                GLX_CONTEXT_MAJOR_VERSION_ARB, cdata->minimalGLVersionMajor,
-                GLX_CONTEXT_MINOR_VERSION_ARB, cdata->minimalGLVersionMinor,
+                GLX_CONTEXT_MAJOR_VERSION_ARB, contextData_FA.minimalGLVersionMajor,
+                GLX_CONTEXT_MINOR_VERSION_ARB, contextData_FA.minimalGLVersionMinor,
                 //GLX_CONTEXT_FLAGS_ARB        , GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
                 None
             };
 
-        cdata->ctx = glXCreateContextAttribsARB(cdata->display, bestFbc, 0,
+        contextData_FA.ctx = glXCreateContextAttribsARB(contextData_FA.display, bestFbc, 0,
                                           1, context_attribs);
 
         // Sync to ensure any errors generated are processed.
-        XSync(cdata->display, False);
+        XSync(contextData_FA.display, False);
 
-        if (cdata->ctx)
-            printf("Created GL %u.%u context\n", cdata->minimalGLVersionMajor, cdata->minimalGLVersionMinor);
+        if (contextData_FA.ctx)
+            printf("Created GL %u.%u context\n", contextData_FA.minimalGLVersionMajor, contextData_FA.minimalGLVersionMinor);
         else
         {
             logError("Failed to create GL %u.%u context!");
@@ -241,12 +241,12 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
     }
 
     // Sync to ensure any errors generated are processed.
-    XSync(cdata->display, 0);
+    XSync(contextData_FA.display, 0);
     
     // Restore the original error handler
     XSetErrorHandler(oldHandler);
 
-    if (!cdata->ctx)
+    if (!contextData_FA.ctx)
     {
         logError("Failed to create an OpenGL context!");
         exit(0);
@@ -254,7 +254,7 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
 
 #if 0
     // Verifying that context is a direct context
-    if (!glXIsDirect(cdata->display, cdata->ctx))
+    if (!glXIsDirect(contextData_FA.display, contextData_FA.ctx))
     {
         logS("Indirect GLX rendering context obtained");
     }
@@ -264,24 +264,24 @@ void configureOpenGL(ContextData* cdata, UserVSyncData* udata)
     }
 #endif
 
-    cdata->deleteMessage = XInternAtom(cdata->display, "WM_DELETE_WINDOW", 0);
-    XSetWMProtocols(cdata->display, cdata->window, &cdata->deleteMessage, 1);
+    contextData_FA.deleteMessage = XInternAtom(contextData_FA.display, "WM_DELETE_WINDOW", 0);
+    XSetWMProtocols(contextData_FA.display, contextData_FA.window, &contextData_FA.deleteMessage, 1);
 
-    XSelectInput(cdata->display, cdata->window, ButtonPressMask|ButtonReleaseMask|
+    XSelectInput(contextData_FA.display, contextData_FA.window, ButtonPressMask|ButtonReleaseMask|
                  StructureNotifyMask|KeyPressMask|KeyReleaseMask|KeymapStateMask|
                  PointerMotionMask);
     
-    glXMakeCurrent(cdata->display, cdata->window, cdata->ctx);
+    glXMakeCurrent(contextData_FA.display, contextData_FA.window, contextData_FA.ctx);
 }
 
 void freeContextData(ContextData* cdata)
 {
-    glXMakeCurrent(cdata->display, 0, 0);
-    glXDestroyContext(cdata->display, cdata->ctx);
+    glXMakeCurrent(contextData_FA.display, 0, 0);
+    glXDestroyContext(contextData_FA.display, contextData_FA.ctx);
 
-    XDestroyWindow(cdata->display, cdata->window);
-    XFreeColormap(cdata->display, cdata->cmap);
-    XCloseDisplay(cdata->display);
+    XDestroyWindow(contextData_FA.display, contextData_FA.window);
+    XFreeColormap(contextData_FA.display, contextData_FA.cmap);
+    XCloseDisplay(contextData_FA.display);
 }
 
 void loadFunctionPointers()
@@ -371,7 +371,7 @@ Color unsignedToColor(unsigned mask)
     return res;
 }
 
-void createTextureForDrawingBuffer(ContextData* cdata, PixelBufferData* pdata)
+void createTextureForDrawingBuffer(PixelBufferData* pdata)
 {
     glGenTextures(1, &pdata->texture);
     glBindTexture(GL_TEXTURE_2D, pdata->texture);
@@ -412,11 +412,11 @@ void createTextureForDrawingBuffer(ContextData* cdata, PixelBufferData* pdata)
     glEnableVertexAttribArray_FA(1);
 }
 
-void drawTextureWithBufferData(ContextData* cdata, PixelBufferData* pdata)
+void drawTextureWithBufferData(PixelBufferData* pdata)
 {
     glBindTexture(GL_TEXTURE_2D, pdata->texture);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, cdata->windowWidth, cdata->windowHeight,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, contextData_FA.windowWidth, contextData_FA.windowHeight,
                  0, GL_RGBA, GL_UNSIGNED_BYTE, pdata->pixels);
 
     glUseProgram_FA(pdata->basicProgram);
@@ -445,7 +445,7 @@ Color lerpColor(const Color* a, const Color* b, const float t)
     return res;
 }
 
-void configurePingpongBuffer(ContextData* cdata, PingpongBuffer* pbuf)
+void configurePingpongBuffer(PingpongBuffer* pbuf)
 {
     glGenFramebuffers_FA(2, pbuf->fbo);
     glGenTextures(2, pbuf->texture);
@@ -454,7 +454,7 @@ void configurePingpongBuffer(ContextData* cdata, PingpongBuffer* pbuf)
         glBindFramebuffer_FA(GL_FRAMEBUFFER, pbuf->fbo[i]);
         glBindTexture(GL_TEXTURE_2D, pbuf->texture[i]);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F,
-                     cdata->windowWidth, cdata->windowHeight,
+                     contextData_FA.windowWidth, contextData_FA.windowHeight,
                      0, GL_RED, GL_FLOAT, 0);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -615,9 +615,9 @@ unsigned createShaderProgram(const char* pathToVS, const char* pathToFS)
 }
 
 
-void disableVSyncIfPossible(ContextData* cdata, UserVSyncData* udata)
+void disableVSyncIfPossible()
 {
-    if (udata->mask == 0)
+    if (vSyncData_FA.mask == 0)
     {
         logWarning("No extension supporting v-sync control found! Will run without it...");
         return;
@@ -625,28 +625,28 @@ void disableVSyncIfPossible(ContextData* cdata, UserVSyncData* udata)
 
     logWarning("V-SYNC DISABLED!");
 
-    if (udata->mask & MESA_V_SYNC)
+    if (vSyncData_FA.mask & MESA_V_SYNC)
     {
         glXSwapIntervalMESA_FA(0);
         return;
     }
 
-    if (udata->mask & EXT_V_SYNC)
+    if (vSyncData_FA.mask & EXT_V_SYNC)
     {
-        glXSwapIntervalEXT_FA(cdata->display, glXGetCurrentDrawable(), 0);
+        glXSwapIntervalEXT_FA(contextData_FA.display, glXGetCurrentDrawable(), 0);
         return;
     }
 
-    if (udata->mask & SGI_V_SYNC)
+    if (vSyncData_FA.mask & SGI_V_SYNC)
     {
         glXSwapIntervalSGI_FA(0);
         return;
     }
 }
 
-void enableVSyncIfPossible(ContextData* cdata, UserVSyncData* udata)
+void enableVSyncIfPossible()
 {
-    if (udata->mask == 0)
+    if (vSyncData_FA.mask == 0)
     {
         logWarning("No extension supporting v-sync control found! Will run without it...");
         return;
@@ -654,19 +654,19 @@ void enableVSyncIfPossible(ContextData* cdata, UserVSyncData* udata)
 
     logWarning("V-SYNC ENABLED!");
 
-    if (udata->mask & MESA_V_SYNC)
+    if (vSyncData_FA.mask & MESA_V_SYNC)
     {
         glXSwapIntervalMESA_FA(1);
         return;
     }
 
-    if (udata->mask & EXT_V_SYNC)
+    if (vSyncData_FA.mask & EXT_V_SYNC)
     {
-        glXSwapIntervalEXT_FA(cdata->display, glXGetCurrentDrawable(), 1);
+        glXSwapIntervalEXT_FA(contextData_FA.display, glXGetCurrentDrawable(), 1);
         return;
     }
 
-    if (udata->mask & SGI_V_SYNC)
+    if (vSyncData_FA.mask & SGI_V_SYNC)
     {
         glXSwapIntervalSGI_FA(1);
         return;
@@ -674,9 +674,9 @@ void enableVSyncIfPossible(ContextData* cdata, UserVSyncData* udata)
 }
 
 
-void enableAdaptiveVSyncIfPossible(ContextData* cdata, UserVSyncData* udata)
+void enableAdaptiveVSyncIfPossible()
 {
-    if (udata->mask == 0)
+    if (vSyncData_FA.mask == 0)
     {
         logWarning("No extension supporting v-sync control found! Will run without configuring it...");
         return;
@@ -684,19 +684,19 @@ void enableAdaptiveVSyncIfPossible(ContextData* cdata, UserVSyncData* udata)
 
     logWarning("ADAPTIVE V-SYNC ENABLED!");
 
-    if (udata->mask & MESA_V_SYNC)
+    if (vSyncData_FA.mask & MESA_V_SYNC)
     {
         glXSwapIntervalMESA_FA(-1);
         return;
     }
 
-    if (udata->mask & EXT_V_SYNC)
+    if (vSyncData_FA.mask & EXT_V_SYNC)
     {
-        glXSwapIntervalEXT_FA(cdata->display, glXGetCurrentDrawable(), -1);
+        glXSwapIntervalEXT_FA(contextData_FA.display, glXGetCurrentDrawable(), -1);
         return;
     }
 
-    if (udata->mask & SGI_V_SYNC)
+    if (vSyncData_FA.mask & SGI_V_SYNC)
     {
         glXSwapIntervalSGI_FA(-1);
         return;
@@ -799,4 +799,17 @@ unsigned loadBMPtexture(const char* filename, unsigned* texture)
     }
 
     return success;
+}
+
+void mouseCoordsToNDC()
+{
+    mouseState_FA.posX *= 2;
+    mouseState_FA.posX -= contextData_FA.windowWidth;
+
+    mouseState_FA.posY *= 2;
+    mouseState_FA.posY -= contextData_FA.windowHeight;
+    mouseState_FA.posY *= -1.0f;
+
+    mouseState_FA.posX /= contextData_FA.windowWidth;
+    mouseState_FA.posY /= contextData_FA.windowHeight;
 }

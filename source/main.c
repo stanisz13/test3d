@@ -8,21 +8,18 @@ int main(int argc, char* argv[])
     newLine();
     newLine();
 
-    ContextData contextData;
-    contextData.minimalGLXVersionMajor = 1;
-    contextData.minimalGLXVersionMinor = 3;
-    contextData.minimalGLVersionMajor = 3;
-    contextData.minimalGLVersionMinor = 3;
-    contextData.windowWidth = 800;
-    contextData.windowHeight = 800;
-    contextData.name = "Faith";
+    contextData_FA.minimalGLXVersionMajor = 1;
+    contextData_FA.minimalGLXVersionMinor = 3;
+    contextData_FA.minimalGLVersionMajor = 3;
+    contextData_FA.minimalGLVersionMinor = 3;
+    contextData_FA.windowWidth = 800;
+    contextData_FA.windowHeight = 800;
+    contextData_FA.name = "Faith";
 
-    UserVSyncData userVSyncData;
-
-    configureOpenGL(&contextData, &userVSyncData);
+    configureOpenGL();
     loadFunctionPointers();
 
-    camera_FA.pos = initFVec3(0.0f, 0.0f, 4.0f);
+    camera_FA.pos = initFVec3(0.0f, 0.0f, 2.0f);
     camera_FA.target = initFVec3(0.0f, 0.0f, 0.0f);
     camera_FA.absoluteUp = initFVec3(0.0f, 1.0f, 0.0f);
     
@@ -86,7 +83,7 @@ int main(int argc, char* argv[])
     glVertexAttribPointer_FA(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray_FA(1);
 
-    float aRatio = (float)contextData.windowWidth / contextData.windowHeight;
+    float aRatio = (float)contextData_FA.windowWidth / contextData_FA.windowHeight;
 
 
     unsigned tex;
@@ -110,9 +107,9 @@ int main(int argc, char* argv[])
     glUniformMatrix4fv_FA(viewLoc, 1, GL_FALSE, view.mem);
 
 #if 0
-    disableVSyncIfPossible(&contextData, &userVSyncData);
+    disableVSyncIfPossible();
 #else
-    enableVSyncIfPossible(&contextData, &userVSyncData);
+    enableVSyncIfPossible();
 #endif
 
     struct timespec prevTime;
@@ -127,14 +124,14 @@ int main(int argc, char* argv[])
         XEvent event;
         mouseState_FA.wheel = 0;
 
-        while (XPending(contextData.display))
+        while (XPending(contextData_FA.display))
         {
-            XNextEvent(contextData.display, &event);
+            XNextEvent(contextData_FA.display, &event);
             
             switch (event.type)
             {
                 case ClientMessage:
-                    if (event.xclient.data.l[0] == contextData.deleteMessage)
+                    if (event.xclient.data.l[0] == contextData_FA.deleteMessage)
                         isRunning = 0;
                     break;
 
@@ -182,15 +179,7 @@ int main(int argc, char* argv[])
                     mouseState_FA.posX = event.xmotion.x;
                     mouseState_FA.posY = event.xmotion.y;
 
-                    mouseState_FA.posX *= 2;
-                    mouseState_FA.posX -= contextData.windowWidth;
-
-                    mouseState_FA.posY *= 2;
-                    mouseState_FA.posY -= contextData.windowHeight;
-                    mouseState_FA.posY *= -1.0f;
-
-                    mouseState_FA.posX /= contextData.windowWidth;
-                    mouseState_FA.posY /= contextData.windowHeight;
+                    mouseCoordsToNDC();
                     
                     break;
 
@@ -219,7 +208,7 @@ int main(int argc, char* argv[])
         
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        glXSwapBuffers(contextData.display, contextData.window);
+        glXSwapBuffers(contextData_FA.display, contextData_FA.window);
 
         struct timespec nowTime;
         clock_gettime(CLOCK_MONOTONIC_RAW, &nowTime);
@@ -247,7 +236,7 @@ int main(int argc, char* argv[])
 #endif
     }
 
-    freeContextData(&contextData);
+    freeContextData();
     glDeleteBuffers_FA(1, &VBO);
     glDeleteVertexArrays_FA(1, &VAO);
 
