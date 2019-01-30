@@ -22,6 +22,10 @@ int main(int argc, char* argv[])
     configureOpenGL(&contextData, &userVSyncData);
     loadFunctionPointers();
 
+    camera_FA.pos = initFVec3(0.0f, 0.0f, 4.0f);
+    camera_FA.target = initFVec3(0.0f, 0.0f, 0.0f);
+    camera_FA.absoluteUp = initFVec3(0.0f, 1.0f, 0.0f);
+    
     float vertices[] = {
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
@@ -97,10 +101,10 @@ int main(int argc, char* argv[])
     unsigned modelLoc = glGetUniformLocation_FA(basic, "model");
     unsigned projLoc = glGetUniformLocation_FA(basic, "proj");
     unsigned viewLoc = glGetUniformLocation_FA(basic, "view");
-                        
+
     FMat4 model = translationFMat4(initFVec3(0.0f, 0.0f, -3.0f));
     FMat4 proj = perspectiveFMat4(0.01f, 10.0f, aRatio, degreesToRadians(45.0f));
-    FMat4 view = identityFMat4();
+    FMat4 view = lookAt();
     
     glUniformMatrix4fv_FA(projLoc, 1, GL_FALSE, proj.mem);
     glUniformMatrix4fv_FA(viewLoc, 1, GL_FALSE, view.mem);
